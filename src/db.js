@@ -3,12 +3,23 @@ const { Sequelize } = require('sequelize');
 const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
-const { DB_USER, DB_PASSWORD, DB_HOST, ApiKey } = process.env;
+const {
+  DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_URI
+} = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/videogames`, {
+//  Conexion con DB PostgreSQL alojada en servidor externo
+const sequelize = new Sequelize(`${DB_URI}`, {
   logging: false, // set to console.log to see the raw SQL queries
   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
+
+  // dialectOptions: {               // requerido para conectar a Heroku DB Postgresql
+  //   ssl:{                         //
+  //     require:true,               //
+  //     rejectUnauthorized: false   //
+  //   }                             //
+  // }                               //
 });
+
 const basename = path.basename(__filename);
 
 const modelDefiners = [];
