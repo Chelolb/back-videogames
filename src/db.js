@@ -4,7 +4,7 @@ const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
 const {
-  DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_URI
+  DB_URI
 } = process.env;
 
 //  Conexion con DB PostgreSQL alojada en servidor externo
