@@ -50,12 +50,12 @@ router.get('/', async (req, res) => {
 
       // BUSQUEDA API
 
-      let apiResult = await axios.get(`https://api.rawg.io/api/games?key=${ApiKey}&page=1&page_size=50`);
-        promise1 = apiResult;
+      let apiResult = await axios.get(`https://api.rawg.io/api/games?key=${ApiKey}&page=1&page_size=40`);
+        promise1 = apiResult;             // lanza 3 peticiones que devolverán 40 videojuegos cada una
 
         let urlText = apiResult.data.next;
 
-        apiResult =  await axios.get(`${urlText}`);
+        apiResult =  await axios.get(`${urlText}`); // la URL de la peticion esta en la key "next" anterior 
         promise2 = apiResult;
         
         urlText = apiResult.data.next;
@@ -63,21 +63,19 @@ router.get('/', async (req, res) => {
         apiResult =  await axios.get(`${urlText}`);
         promise3 = apiResult;
 
-        await Promise.all([ promise1, promise2, promise3 ])
+        await Promise.all([ promise1, promise2, promise3 ]) // espera el resultado de las 3 peticiones
 
-        .then((value) => { apiResult = value[0].data.results
+        .then((value) => { apiResult = value[0].data.results  // concatena los resultados
           .concat(value[1].data.results)
             .concat(value[2].data.results) });
       
-        let resolve = [];   // Aqui los video juegos en DB
+        let resolve = [];
 
-        let resolveGen = [];// Aqui guardamos "Todos los Géneros"
+        let resolveGen = [];
 
         if(apiResult.length){
 
-          //console.log("Cantidad de videoguegos= ", apiResult.length) // <---- ver esto "solo envia 40"
-
-          apiResult?.map((e) => {  //Barre cada videojuego
+          apiResult?.map((e) => {  //Barre cada videojuego del array
 
             let genreGroup = [];  // Buscamos los generos
               e.genres?.map(e => {
@@ -108,7 +106,6 @@ router.get('/', async (req, res) => {
 
           })
 
-          // console.log(resolveGen)
         }
         
         // Agrega Dietas aun no registradas
@@ -124,8 +121,15 @@ router.get('/', async (req, res) => {
       
       // BUSQUEDA EN DB
 
+      if (name.match(/[$%&/()=+-@-,.?¿'¡!"]/)) {  // si tiene caracteres extraños
+
+        return res.status(200).send( // rechaza la peticion
+          {msg:`No se indicó el parámetro name, o se incluyeron caracteres inválidos`}  // envia msg
+          );     
+      }
+
       let resolveDB = await Videogame.findAll({
-        where: { name: { [Op.like]: `%${name}%` } },
+        where: { name: { [Op.iLike]: `%${name}%` } },
         include: [
           { model: Genre, attributes: ["name"], through: { attributes: [] } },
         ],
@@ -223,6 +227,15 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
+   
+  if (!id || id.match(/[$%&/()=+@ ,.?¿'¡!"]/)) {
+    //if (!id) {
+
+        return res.status(200).send(
+            {msg:`No se indicó el parámetro id, o se incluyeron caracteres inválidos`}
+            );
+  }
+
   try { // LLAMADA POR ID
   
     console.log(id)
