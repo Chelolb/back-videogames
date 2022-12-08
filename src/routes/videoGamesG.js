@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     if(!name) {// LLAMADA GENERAL
 
       // BUSQUEDA EN DB
-      let resolveDB = await Videogame.findAll({ attributes: [ 'id', 'name', 'description', 'released', 'rating', 'background_image', 'platforms', 'createdDB' ],
+      let resolveDB = await Videogame.findAll({ attributes: [ 'id', 'name', 'description', 'released', 'rating', 'background_image', 'platforms', 'createdDb' ],
       include: [
         { model: Genre, attributes: ["name"], through: { attributes: [] } }
       ]})
@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
                 rating: e.rating,
                 background_image: e.background_image,
                 genres: formated,
-                createdDB: e.createdDB,       
+                createdDb: e.createdDb,       
         }
 
         dbFormat.push(obj);
@@ -92,7 +92,7 @@ router.get('/', async (req, res) => {
               background_image: e.background_image,
               genres: e.genres,
               genres : genreGroup,
-              createdDB: false
+              createdDb: false
             }
             
             for (let i = 0; i < genreGroup.length; i++) { // agrega generos distintos al array
@@ -154,7 +154,7 @@ router.get('/', async (req, res) => {
                 rating: e.rating,
                 background_image: e.background_image,
                 genres: formated,
-                createdDB: e.createdDB,       
+                createdDb: e.createdDb,       
         }
 
         dbFormat.push(obj);
@@ -192,7 +192,7 @@ router.get('/', async (req, res) => {
               background_image: e.background_image,
               genres: e.genres,
               genres : genreGroup,
-              createdDB: false
+              createdDb: false
             }
             
             for (let i = 0; i < genreGroup.length; i++) { // agrega generos distintos al array
@@ -272,7 +272,7 @@ router.get('/:id', async (req, res) => {
                 background_image: resolveDB.background_image,
                 platforms: resolveDB.platforms,
                 genres: formated,
-                createdDB: resolveDB.createdDB,       
+                createdDb: resolveDB.createdDb,       
         }
 
         res.status(200).send(obj);  
@@ -316,7 +316,8 @@ router.get('/:id', async (req, res) => {
             rating: apiResult.rating,
             background_image: apiResult.background_image,
             platforms: arrPlatforms,
-            genres: arrGenres
+            genres: arrGenres,
+            createdDb: false
           }
 
           res.status(200).send(obj)
