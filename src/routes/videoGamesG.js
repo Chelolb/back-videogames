@@ -12,26 +12,26 @@ router.get('/', async (req, res) => {
   const { name } = req.query;
 
   try {
-    if(!name) {// LLAMADA GENERAL
+    if(!name) {// general call
 
-      // BUSQUEDA EN DB
+      // search in DB
       let resolveDB = await Videogame.findAll({ attributes: [ 'id', 'name', 'description', 'released', 'rating', 'background_image', 'platforms', 'createdDb' ],
       include: [
         { model: Genre, attributes: ["name"], through: { attributes: [] } }
       ]})
   
-      let dbFormat = [];  // Aqui los video juegos en DB
+      let dbFormat = [];  // here the videogame in DB
   
       if (resolveDB.length){
 
-      resolveDB?.map((e) => {  //Barre cada videojuego en DB 
+      resolveDB?.map((e) => {  //sweep every videogame in DB 
         
-        let genres = e["genres"];// Buscamos los generos
+        let genres = e["genres"];// search the genres
         let formated = [];
         genres.map((e) => formated.push(e["name"]));
 
 
-        let obj = {  // crea el objeto videojuego
+        let obj = {  // make object videogame
                 id: e.id,
                 name: e.name,
                 description: e.description,
@@ -48,14 +48,14 @@ router.get('/', async (req, res) => {
       }
       
 
-      // BUSQUEDA API
+      // search API
 
       let apiResult = await axios.get(`https://api.rawg.io/api/games?key=${ApiKey}&page=1&page_size=40`);
-        promise1 = apiResult;             // lanza 3 peticiones que devolverán 40 videojuegos cada una
+        promise1 = apiResult;             // launch 3 resquests that will return 40 videogames each
 
         let urlText = apiResult.data.next;
 
-        apiResult =  await axios.get(`${urlText}`); // la URL de la peticion esta en la key "next" anterior 
+        apiResult =  await axios.get(`${urlText}`); // the recuests's URL is in the key "next" prev
         promise2 = apiResult;
         
         urlText = apiResult.data.next;
@@ -63,9 +63,9 @@ router.get('/', async (req, res) => {
         apiResult =  await axios.get(`${urlText}`);
         promise3 = apiResult;
 
-        await Promise.all([ promise1, promise2, promise3 ]) // espera el resultado de las 3 peticiones
+        await Promise.all([ promise1, promise2, promise3 ]) // wait for results of the 3 requests
 
-        .then((value) => { apiResult = value[0].data.results  // concatena los resultados
+        .then((value) => { apiResult = value[0].data.results  // concat the results
           .concat(value[1].data.results)
             .concat(value[2].data.results) });
       
@@ -74,16 +74,15 @@ router.get('/', async (req, res) => {
         let resolveGen = [];
 
         if(apiResult.length){
+          apiResult?.map((e) => {  //sweep every  array videogame array
 
-          apiResult?.map((e) => {  //Barre cada videojuego del array
-
-            let genreGroup = [];  // Buscamos los generos
+            let genreGroup = [];  // search in genres
               e.genres?.map(e => {
               let gen = e.name
               genreGroup.push(gen)
             })
 
-            let obj = { // crea el objeto videojuego
+            let obj = { // make object videogame
               id: e.id,
               name: e.name,
               description: e.description,
@@ -95,8 +94,8 @@ router.get('/', async (req, res) => {
               createdDb: false
             }
             
-            for (let i = 0; i < genreGroup.length; i++) { // agrega generos distintos al array
-              let elemento = genreGroup[i]                // de "Todos los Géneros"
+            for (let i = 0; i < genreGroup.length; i++) { // add genres different at array "All Genres"
+              let elemento = genreGroup[i]                
               if(!resolveGen.includes(elemento)){
                 resolveGen.push(elemento)//20
               }
@@ -108,7 +107,7 @@ router.get('/', async (req, res) => {
 
         }
         
-        // Agrega Dietas aun no registradas
+        // add genres not yet registred
         resolveGen.map(async (e) => {
           await Genre.findOrCreate({ where: { name: e } });
         })
@@ -117,13 +116,13 @@ router.get('/', async (req, res) => {
 
         res.status(200).send(Total);
 
-    } else {// LLAMADA POR NOMBRE
+    } else {// call by name
       
-      // BUSQUEDA EN DB
+      // Search in DB
 
       if (name.match(/[$%&/()=+-@-,.?¿'¡!"]/)) {  // si tiene caracteres extraños
 
-        return res.status(200).send( // rechaza la peticion
+        return res.status(200).send( // reject the require
           {msg:`No se indicó el parámetro name, o se incluyeron caracteres inválidos`}  // envia msg
           );     
       }
@@ -135,18 +134,18 @@ router.get('/', async (req, res) => {
         ],
       });
   
-      let dbFormat = [];  // Aqui los video juegos en DB
+      let dbFormat = [];  // here the videogames in DB
   
       if (resolveDB.length){
 
-      resolveDB?.map((e) => {  //Barre cada videojuego en DB 
+      resolveDB?.map((e) => {  //sweep every videogame in DB 
         
-        let genres = e["genres"];// Buscamos los generos
+        let genres = e["genres"];// search the genres
         let formated = [];
         genres.map((e) => formated.push(e["name"]));
 
 
-        let obj = {  // crea el objeto videojuego
+        let obj = {  // make object videogame
                 id: e.id,
                 name: e.name,
                 description: e.description,
@@ -163,27 +162,27 @@ router.get('/', async (req, res) => {
       }
 
 
-      // BUSQUEDA API
+      // search to API
         let apiResult = await axios.get(`https://api.rawg.io/api/games?search=${name}&key=${ApiKey}&page_size=15`);
         apiResult = apiResult.data.results;
 
         
         
-        let resolve = [];   // Aqui los video juegos en DB
+        let resolve = [];   // here the videogames in API
 
-        let resolveGen = [];// Aqui guardamos "Todos los Géneros"
+        let resolveGen = [];// save "ALL Genres"
 
         if(apiResult.length){
 
-          apiResult?.map((e) => {  //Barre cada videojuego
+          apiResult?.map((e) => {  //sweep every videogame
 
-            let genreGroup = [];  // Buscamos los generos
+            let genreGroup = [];  // search the genres
               e.genres?.map(e => {
               let gen = e.name
               genreGroup.push(gen)
             })
 
-            let obj = { // crea el objeto videojuego
+            let obj = { // make the object videogame
               id: e.id,
               name: e.name,
               description: e.description,
@@ -195,8 +194,8 @@ router.get('/', async (req, res) => {
               createdDb: false
             }
             
-            for (let i = 0; i < genreGroup.length; i++) { // agrega generos distintos al array
-              let elemento = genreGroup[i]                // de "Todos los Géneros"
+            for (let i = 0; i < genreGroup.length; i++) { // add genres different to array "ALL Genres"
+              let elemento = genreGroup[i]               
               if(!resolveGen.includes(elemento)){
                 resolveGen.push(elemento)//20
               }
@@ -206,10 +205,9 @@ router.get('/', async (req, res) => {
 
           })
 
-          // console.log(resolveGen)
         }
         
-        // Agrega Dietas aun no registradas
+        // add genres not yet registered
         resolveGen.map(async (e) => {
           await Genre.findOrCreate({ where: { name: e } });
         })
@@ -236,19 +234,16 @@ router.get('/:id', async (req, res) => {
             );
   }
 
-  try { // LLAMADA POR ID
+  try { // Call by ID
   
     console.log(id)
-  if (                      //Las Recetas en BD tiene ID en formato UUIDV4??...
+  if (                      // if ID is UUID Format?
     id.match(
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     )
   ) { // ID tiene formato UUID, busca en bd 
 
-    // console.log(id);
-    // res.status(200).send({msg : "detecto UUID"});
-
-      // BUSQUEDA EN DB
+      // shearch in DB
 
       let resolveDB = await Videogame.findOne({
         where: { id: id },
@@ -257,10 +252,12 @@ router.get('/:id', async (req, res) => {
         ],
       });
 
-      if (resolveDB !== null){ // Si se encontró el videojuego
+      if (resolveDB !== null){ // if found videogame
   
-        let formated = [];  // Buscamos los generos
+        let formated = [];  // search all genres
         resolveDB.genres.map((e) => formated.push(e["name"]));
+
+        let arrayPlatforms = resolveDB.platforms.split(', ')  // get platforms's array
   
 
         let obj = {  // crea el objeto videojuego
@@ -270,7 +267,8 @@ router.get('/:id', async (req, res) => {
                 released: resolveDB.released,
                 rating: resolveDB.rating,
                 background_image: resolveDB.background_image,
-                platforms: resolveDB.platforms,
+                //platforms: resolveDB.platforms,
+                platforms: arrayPlatforms,
                 genres: formated,
                 createdDb: resolveDB.createdDb,       
         }
@@ -284,24 +282,24 @@ router.get('/:id', async (req, res) => {
 
   }
 
-  else{ // sino busca en la API externa
+  else{ // else search in the outer API
       
       const result = await axios.get(`https://api.rawg.io/api/games/${id}?key=${ApiKey}`);
       let apiResult = result.data;
 
       if(apiResult) {
         
-          let arrPlatforms = [] // guardo plataformas
+          let arrPlatforms = [] // save platforms
 
-          apiResult.platforms?.map((e) =>{  // busco las plataformas
+          apiResult.platforms?.map((e) =>{  // search platforms
             arrPlatforms.push(e.platform.name)
           })
 
-          let arrGenres = [] // guardo generos
+          let arrGenres = [] // save genres
 
-          if(apiResult.genres) {  // si hay generos...
-            apiResult.genres?.map((e) =>{  // busco las generos
-              arrGenres.push(e.name)  // los guardo en un array
+          if(apiResult.genres) {  // if have genres...
+            apiResult.genres?.map((e) =>{  // read genres
+              arrGenres.push(e.name)  // sabe in an array
             })
 
           }
