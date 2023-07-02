@@ -3,6 +3,13 @@ const { Sequelize } = require('sequelize');
 const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
+// const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, ApiKey } = process.env;
+
+// const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`, {
+//   logging: false, // set to console.log to see the raw SQL queries
+//   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
+// });
+
 const {
   DB_URI
 } = process.env;
@@ -19,6 +26,7 @@ const sequelize = new Sequelize(`${DB_URI}`, {
   //   }                             //
   // }                               //
 });
+
 
 const basename = path.basename(__filename);
 

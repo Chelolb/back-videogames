@@ -21,7 +21,9 @@ router.get('/', async (req, res) => {
       ]})
   
       let dbFormat = [];  // here the videogame in DB
-  
+
+      console.log(resolveDB.length);
+
       if (resolveDB.length){
 
       resolveDB?.map((e) => {  //sweep every videogame in DB 
@@ -29,7 +31,6 @@ router.get('/', async (req, res) => {
         let genres = e["genres"];// search the genres
         let formated = [];
         genres.map((e) => formated.push(e["name"]));
-
 
         let obj = {  // make object videogame
                 id: e.id,
@@ -73,14 +74,26 @@ router.get('/', async (req, res) => {
 
         let resolveGen = [];
 
+        let resolvePlat = [];
+
         if(apiResult.length){
-          apiResult?.map((e) => {  //sweep every  array videogame array
+          apiResult?.map((e) => {  //sweep every array videogame array
 
             let genreGroup = [];  // search in genres
               e.genres?.map(e => {
               let gen = e.name
               genreGroup.push(gen)
             })
+
+            // //Code for read all platforms //
+            // let platformsGroup = [] // save platforms
+
+            //   e.platforms?.map((e) =>{  // search platforms
+
+            //   platformsGroup.push(e.platform.name)
+            // })
+            // //--------------------------------------------
+
 
             let obj = { // make object videogame
               id: e.id,
@@ -97,14 +110,26 @@ router.get('/', async (req, res) => {
             for (let i = 0; i < genreGroup.length; i++) { // add genres different at array "All Genres"
               let elemento = genreGroup[i]                
               if(!resolveGen.includes(elemento)){
-                resolveGen.push(elemento)//20
+                resolveGen.push(elemento)
               }
             }
+        
+            // //Code for read all platforms //
+            // for (let i = 0; i < platformsGroup.length; i++) { // add genres different at array "All Genres"
+            //   let elemento = platformsGroup[i]                
+            //   if(!resolvePlat.includes(elemento)){
+            //     resolvePlat.push(elemento)
+            //   }
+            // }
+            // //-----------------------------------------------------------
 
             resolve.push(obj);
 
           })
 
+          // //Code for read all platforms //
+          // console.log(resolvePlat);
+          // //------------------------------
         }
         
         // add genres not yet registred
